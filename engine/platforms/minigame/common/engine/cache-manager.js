@@ -25,7 +25,7 @@
 const {
     getUserDataPath, readJsonSync, makeDirSync,
     writeFileSync, copyFile, downloadFile, deleteFile,
-    rmdirSync, unzip, isOutOfStorage,
+    rmdirSync, unzip, isOutOfStorage,exists,
 } = window.fsUtils;
 
 let checkNextPeriod = false;
@@ -236,7 +236,12 @@ const cacheManager = {
     },
 
     makeBundleFolder (bundleName) {
-        makeDirSync(`${this.cacheDir}/${bundleName}`, true);
+        //[自定义]，创建目录前判断一下目录是否已经存在
+        exists(`${this.cacheDir}/${bundleName}`,(isExists)=>{
+            if(!isExists){
+                makeDirSync(`${this.cacheDir}/${bundleName}`, true);
+            }
+        });
     },
 
     unzipAndCacheBundle (id, zipFilePath, cacheBundleRoot, onComplete) {
@@ -257,6 +262,13 @@ const cacheManager = {
             self.cachedFiles.add(id, { bundle: cacheBundleRoot, url: targetPath, lastTime: time });
             self.writeCacheFile();
             onComplete && onComplete(null, targetPath);
+
+            //[自定义]，文件解压后，将zip包删除
+            exists(zipFilePath, (res) => {
+                if (res) {
+                    deleteFile(zipFilePath);
+                }
+            })
         });
     },
 

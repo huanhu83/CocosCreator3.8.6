@@ -64,7 +64,8 @@ function handleZip (url, options, onComplete) {
         cacheManager.updateLastTime(url);
         onComplete && onComplete(null, cachedUnzip.url);
     } else if (REGEX.test(url)) {
-        downloadFile(url, null, options.header, options.onFileProgress, (err, downloadedZipPath) => {
+        //[自定义]，第二个参数指定文件下载到哪个目录，null下载到temp目录
+        downloadFile(url, options.downloadPath, options.header, options.onFileProgress, (err, downloadedZipPath) => {
             if (err) {
                 onComplete && onComplete(err);
                 return;

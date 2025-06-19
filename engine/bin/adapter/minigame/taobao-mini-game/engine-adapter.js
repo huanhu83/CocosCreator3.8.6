@@ -69,7 +69,8 @@ function handleZip(url, options, onComplete) {
     cacheManager.updateLastTime(url);
     onComplete && onComplete(null, cachedUnzip.url);
   } else if (REGEX.test(url)) {
-    downloadFile(url, null, options.header, options.onFileProgress, function (err, downloadedZipPath) {
+    //[自定义]，第二个参数指定文件下载到哪个目录，null下载到temp目录
+    downloadFile(url, options.downloadPath, options.header, options.onFileProgress, function (err, downloadedZipPath) {
       if (err) {
         onComplete && onComplete(err);
         return;
@@ -512,6 +513,12 @@ cc.assetManager.init = function (options) {
       var delegate = this._delegate;
       var cbs = this._eventListeners;
       cbs.onKeyboardInput = function (res) {
+        //#region [自定义]，添加如下代码，输入内容超出限定长度后截断
+        if (res.value.length > delegate.maxLength) {
+          res.value = res.value.substr(0, delegate.maxLength);
+        }
+        //#endregion
+
         if (delegate._string !== res.value) {
           delegate._editBoxTextChanged(res.value);
         }
@@ -576,7 +583,8 @@ cc.assetManager.init = function (options) {
       var multiline = delegate.inputMode === EditBoxComp.InputMode.ANY;
       __globalAdapter.showKeyboard({
         defaultValue: delegate.string,
-        maxLength: delegate.maxLength < 0 ? MAX_VALUE : delegate.maxLength,
+        maxLength: MAX_VALUE,
+        //delegate.maxLength < 0 ? MAX_VALUE : delegate.maxLength,
         multiple: multiline,
         confirmHold: false,
         confirmType: getKeyboardReturnType(delegate.returnType),
@@ -634,7 +642,8 @@ var _window$fsUtils = window.fsUtils,
   deleteFile = _window$fsUtils.deleteFile,
   rmdirSync = _window$fsUtils.rmdirSync,
   unzip = _window$fsUtils.unzip,
-  isOutOfStorage = _window$fsUtils.isOutOfStorage;
+  isOutOfStorage = _window$fsUtils.isOutOfStorage,
+  exists = _window$fsUtils.exists;
 var checkNextPeriod = false;
 var writeCacheFileList = null;
 var cleaning = false;
@@ -837,7 +846,13 @@ var cacheManager = {
     if (!err) this.outOfStorage = false;
   },
   makeBundleFolder: function makeBundleFolder(bundleName) {
-    makeDirSync("".concat(this.cacheDir, "/").concat(bundleName), true);
+    var _this2 = this;
+    //[自定义]，创建目录前判断一下目录是否已经存在
+    exists("".concat(this.cacheDir, "/").concat(bundleName), function (isExists) {
+      if (!isExists) {
+        makeDirSync("".concat(_this2.cacheDir, "/").concat(bundleName), true);
+      }
+    });
   },
   unzipAndCacheBundle: function unzipAndCacheBundle(id, zipFilePath, cacheBundleRoot, onComplete) {
     var time = Date.now().toString();
@@ -861,6 +876,13 @@ var cacheManager = {
       });
       self.writeCacheFile();
       onComplete && onComplete(null, targetPath);
+
+      //[自定义]，文件解压后，将zip包删除
+      exists(zipFilePath, function (res) {
+        if (res) {
+          deleteFile(zipFilePath);
+        }
+      });
     });
   },
   _isZipFile: function _isZipFile(url) {

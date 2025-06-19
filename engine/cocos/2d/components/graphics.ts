@@ -23,26 +23,24 @@
  THE SOFTWARE.
 */
 
-import { ccclass, help, executionOrder, menu, tooltip, type, visible, override, editable, serializable } from 'cc.decorator';
-import { JSB } from 'internal:constants';
-import { builtinResMgr } from '../../asset/asset-manager';
-import { InstanceMaterialType, UIRenderer } from '../framework/ui-renderer';
-import { director } from '../../game/director';
-import { Color, warnID, cclegacy } from '../../core';
-import { scene } from '../../render-scene';
-import type { IBatcher } from '../renderer/i-batcher';
-import { LineCap, LineJoin } from '../assembler/graphics/types';
-import { Impl } from '../assembler/graphics/webgl/impl';
-import { Material, RenderingSubMesh } from '../../asset/assets';
-import { Format, PrimitiveMode, Attribute, Device, BufferUsageBit, BufferInfo, MemoryUsageBit, deviceManager } from '../../gfx';
-import { vfmtPosColor, getAttributeStride, getComponentPerVertex } from '../renderer/vertex-format';
-import { NativeUIModelProxy } from '../renderer/native-2d';
-import { RenderEntity, RenderEntityType } from '../renderer/render-entity';
-import type { GraphicsAssembler } from '../assembler/graphics/webgl/graphics-assembler';
+import { ccclass, help, executionOrder, menu, tooltip, type, visible, override, editable, serializable } from "cc.decorator";
+import { JSB } from "internal:constants";
+import { builtinResMgr } from "../../asset/asset-manager";
+import { InstanceMaterialType, UIRenderer } from "../framework/ui-renderer";
+import { director } from "../../game/director";
+import { Color, warnID, cclegacy } from "../../core";
+import { scene } from "../../render-scene";
+import type { IBatcher } from "../renderer/i-batcher";
+import { LineCap, LineJoin } from "../assembler/graphics/types";
+import { Impl } from "../assembler/graphics/webgl/impl";
+import { Material, RenderingSubMesh } from "../../asset/assets";
+import { Format, PrimitiveMode, Attribute, Device, BufferUsageBit, BufferInfo, MemoryUsageBit, deviceManager } from "../../gfx";
+import { vfmtPosColor, getAttributeStride, getComponentPerVertex } from "../renderer/vertex-format";
+import { NativeUIModelProxy } from "../renderer/native-2d";
+import { RenderEntity, RenderEntityType } from "../renderer/render-entity";
+import type { GraphicsAssembler } from "../assembler/graphics/webgl/graphics-assembler";
 
-const attributes = vfmtPosColor.concat([
-    new Attribute('a_dist', Format.R32F),
-]);
+const attributes = vfmtPosColor.concat([new Attribute("a_dist", Format.R32F)]);
 
 const componentPerVertex = getComponentPerVertex(attributes);
 
@@ -55,10 +53,10 @@ const stride = getAttributeStride(attributes);
  * @zh
  * 自定义图形类。
  */
-@ccclass('cc.Graphics')
-@help('i18n:cc.Graphics')
+@ccclass("cc.Graphics")
+@help("i18n:cc.Graphics")
 @executionOrder(110)
-@menu('2D/Graphics')
+@menu("2D/Graphics")
 export class Graphics extends UIRenderer {
     /**
      * @en
@@ -68,11 +66,11 @@ export class Graphics extends UIRenderer {
      * 当前线条宽度。
      */
     @editable
-    @tooltip('i18n:graphics.lineWidth')
-    get lineWidth (): number {
+    @tooltip("i18n:graphics.lineWidth")
+    get lineWidth(): number {
         return this._lineWidth;
     }
-    set lineWidth (value) {
+    set lineWidth(value) {
         this._lineWidth = value;
         if (!this.impl) {
             return;
@@ -89,12 +87,12 @@ export class Graphics extends UIRenderer {
      * 用来设置2个长度不为0的相连部分（线段，圆弧，曲线）如何连接在一起的属性。
      */
     @type(LineJoin)
-    @tooltip('i18n:graphics.lineJoin')
-    get lineJoin (): LineJoin {
+    @tooltip("i18n:graphics.lineJoin")
+    get lineJoin(): LineJoin {
         return this._lineJoin;
     }
 
-    set lineJoin (value: LineJoin) {
+    set lineJoin(value: LineJoin) {
         this._lineJoin = value;
         if (!this.impl) {
             return;
@@ -111,12 +109,12 @@ export class Graphics extends UIRenderer {
      * 指定如何绘制每一条线段末端。
      */
     @type(LineCap)
-    @tooltip('i18n:graphics.lineCap')
-    get lineCap (): LineCap {
+    @tooltip("i18n:graphics.lineCap")
+    get lineCap(): LineCap {
         return this._lineCap;
     }
 
-    set lineCap (value: LineCap) {
+    set lineCap(value: LineCap) {
         this._lineCap = value;
         if (!this.impl) {
             return;
@@ -132,13 +130,13 @@ export class Graphics extends UIRenderer {
      * @zh
      * 笔触的颜色。
      */
-    @tooltip('i18n:graphics.strokeColor')
+    @tooltip("i18n:graphics.strokeColor")
     // @constget
-    get strokeColor (): Readonly<Color> {
+    get strokeColor(): Readonly<Color> {
         return this._strokeColor;
     }
 
-    set strokeColor (value) {
+    set strokeColor(value) {
         if (!this.impl) {
             return;
         }
@@ -154,13 +152,13 @@ export class Graphics extends UIRenderer {
      * @zh
      * 填充绘画的颜色。
      */
-    @tooltip('i18n:graphics.fillColor')
+    @tooltip("i18n:graphics.fillColor")
     // @constget
-    get fillColor (): Readonly<Color> {
+    get fillColor(): Readonly<Color> {
         return this._fillColor;
     }
 
-    set fillColor (value) {
+    set fillColor(value) {
         if (!this.impl) {
             return;
         }
@@ -176,23 +174,23 @@ export class Graphics extends UIRenderer {
      * @zh
      * 设置斜接面限制比例。
      */
-    @tooltip('i18n:graphics.miterLimit')
-    get miterLimit (): number {
+    @tooltip("i18n:graphics.miterLimit")
+    get miterLimit(): number {
         return this._miterLimit;
     }
 
-    set miterLimit (value) {
+    set miterLimit(value) {
         this._miterLimit = value;
         // this.impl.miterLimit = value;
     }
 
     @override
     @visible(false)
-    get color (): Color {
+    get color(): Color {
         return this._color;
     }
 
-    set color (value) {
+    set color(value) {
         if (this._color === value) {
             return;
         }
@@ -230,11 +228,11 @@ export class Graphics extends UIRenderer {
     /**
      * @deprecated since v3.7.0, this is an engine private interface that will be removed in the future.
      */
-    get graphicsNativeProxy (): NativeUIModelProxy {
+    get graphicsNativeProxy(): NativeUIModelProxy {
         return this._graphicsNativeProxy;
     }
 
-    constructor () {
+    constructor() {
         super();
         this._instanceMaterialType = InstanceMaterialType.ADD_COLOR;
         this.impl = new Impl(this);
@@ -243,13 +241,13 @@ export class Graphics extends UIRenderer {
         }
     }
 
-    public onRestore (): void {
+    public onRestore(): void {
         if (!this.impl) {
             this._flushAssembler();
         }
     }
 
-    public onLoad (): void {
+    public onLoad(): void {
         super.onLoad();
         if (JSB) {
             this._graphicsNativeProxy.initModel(this.node);
@@ -261,12 +259,12 @@ export class Graphics extends UIRenderer {
         this._flushAssembler();
     }
 
-    public onEnable (): void {
+    public onEnable(): void {
         super.onEnable();
         this._updateMtlForGraphics();
     }
 
-    public onDestroy (): void {
+    public onDestroy(): void {
         this._sceneGetter = null;
         if (JSB) {
             this._graphicsNativeProxy.destroy();
@@ -307,7 +305,7 @@ export class Graphics extends UIRenderer {
      * @param y @en The y-axis coordinate of the target position.
      *          @zh 目标位置的 y 轴坐标。
      */
-    public moveTo (x: number, y: number): void {
+    public moveTo(x: number, y: number): void {
         if (!this.impl) {
             return;
         }
@@ -327,7 +325,7 @@ export class Graphics extends UIRenderer {
      * @param y @en The x-axis coordinate of the target position.
      *          @zh 目标位置的 y 轴坐标。
      */
-    public lineTo (x: number, y: number): void {
+    public lineTo(x: number, y: number): void {
         if (!this.impl) {
             return;
         }
@@ -355,7 +353,7 @@ export class Graphics extends UIRenderer {
      * @param y @en The y-axis coordinate of the last control point.
      *          @zh 最后一个控制点的 y 轴坐标。
      */
-    public bezierCurveTo (c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void {
+    public bezierCurveTo(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void {
         if (!this.impl) {
             return;
         }
@@ -379,7 +377,7 @@ export class Graphics extends UIRenderer {
      * @param y @en The y-axis coordinates of the endpoint control point.
      *          @zh 终点控制点的 x 轴坐标。
      */
-    public quadraticCurveTo (cx: number, cy: number, x: number, y: number): void {
+    public quadraticCurveTo(cx: number, cy: number, x: number, y: number): void {
         if (!this.impl) {
             return;
         }
@@ -408,7 +406,7 @@ export class Graphics extends UIRenderer {
      * @param counterclockwise @en If true, draws counterclockwise between the two angles. Default is clockwise.
      *                         @zh 如果为真，在两个角度之间逆时针绘制。默认顺时针。
      */
-    public arc (cx: number, cy: number, r: number, startAngle: number, endAngle: number, counterclockwise: boolean): void {
+    public arc(cx: number, cy: number, r: number, startAngle: number, endAngle: number, counterclockwise: boolean): void {
         if (!this.impl) {
             return;
         }
@@ -432,7 +430,7 @@ export class Graphics extends UIRenderer {
      * @param ry @en The radius of the y-axis of the ellipse.
      *           @zh 椭圆 y 轴半径。
      */
-    public ellipse (cx: number, cy: number, rx: number, ry: number): void {
+    public ellipse(cx: number, cy: number, rx: number, ry: number): void {
         if (!this.impl) {
             return;
         }
@@ -454,7 +452,7 @@ export class Graphics extends UIRenderer {
      * @param r @en Radius.
      *          @zh 圆半径。
      */
-    public circle (cx: number, cy: number, r: number): void {
+    public circle(cx: number, cy: number, r: number): void {
         if (!this.impl) {
             return;
         }
@@ -478,7 +476,7 @@ export class Graphics extends UIRenderer {
      * @param h @en The height of the rectangle.
      *          @zh 矩形高度。
      */
-    public rect (x: number, y: number, w: number, h: number): void {
+    public rect(x: number, y: number, w: number, h: number): void {
         if (!this.impl) {
             return;
         }
@@ -504,7 +502,7 @@ export class Graphics extends UIRenderer {
      * @param r @en Radius of rectangular rounded corners.
      *          @zh 矩形圆角半径。
      */
-    public roundRect (x: number, y: number, w: number, h: number, r: number): void {
+    public roundRect(x: number, y: number, w: number, h: number, r: number): void {
         if (!this.impl) {
             return;
         }
@@ -528,7 +526,7 @@ export class Graphics extends UIRenderer {
      * @param h @en The height of the rectangle.
      *          @zh 矩形高度。
      */
-    public fillRect (x: number, y: number, w: number, h: number): void {
+    public fillRect(x: number, y: number, w: number, h: number): void {
         this.rect(x, y, w, h);
         this.fill();
     }
@@ -540,7 +538,7 @@ export class Graphics extends UIRenderer {
      * @zh
      * 擦除之前绘制的所有内容的方法。
      */
-    public clear (): void {
+    public clear(): void {
         if (!this.impl) {
             return;
         }
@@ -548,7 +546,7 @@ export class Graphics extends UIRenderer {
         this.impl.clear();
         this._isDrawing = false;
         if (JSB) {
-            this._graphicsNativeProxy.clear();// need native
+            this._graphicsNativeProxy.clear(); // need native
         } else if (this.model) {
             for (let i = 0; i < this.model.subModels.length; i++) {
                 const subModel = this.model.subModels[i];
@@ -567,7 +565,7 @@ export class Graphics extends UIRenderer {
      * @zh
      * 将笔点返回到当前路径起始点的。它尝试从当前点到起始点绘制一条直线。
      */
-    public close (): void {
+    public close(): void {
         if (!this.impl) {
             return;
         }
@@ -582,7 +580,7 @@ export class Graphics extends UIRenderer {
      * @zh
      * 根据当前的画线样式，绘制当前或已经存在的路径。
      */
-    public stroke (): void {
+    public stroke(): void {
         if (!this._assembler) {
             this._flushAssembler();
         }
@@ -599,7 +597,7 @@ export class Graphics extends UIRenderer {
      * @zh
      * 根据当前的画线样式，填充当前或已经存在的路径。
      */
-    public fill (): void {
+    public fill(): void {
         if (!this._assembler) {
             this._flushAssembler();
         }
@@ -609,12 +607,12 @@ export class Graphics extends UIRenderer {
         (this._assembler as GraphicsAssembler).fill(this);
     }
 
-    private _updateMtlForGraphics (): void {
+    private _updateMtlForGraphics(): void {
         let mat;
         if (this._customMaterial) {
             mat = this.getMaterialInstance(0);
         } else {
-            mat = builtinResMgr.get('ui-graphics-material');
+            mat = builtinResMgr.get("ui-graphics-material");
             this.setSharedMaterial(mat as Material, 0);
             mat = this.getMaterialInstance(0);
             mat.recompileShaders({ USE_LOCAL: true });
@@ -624,7 +622,7 @@ export class Graphics extends UIRenderer {
     /**
      * @deprecated since v3.7.0, this is an engine private interface that will be removed in the future.
      */
-    public activeSubModel (idx: number): void {
+    public activeSubModel(idx: number): void {
         if (!this.model) {
             warnID(4500, this.node.name);
             return;
@@ -632,18 +630,10 @@ export class Graphics extends UIRenderer {
 
         if (this.model.subModels.length <= idx) {
             const gfxDevice: Device = deviceManager.gfxDevice;
-            const vertexBuffer = gfxDevice.createBuffer(new BufferInfo(
-                BufferUsageBit.VERTEX | BufferUsageBit.TRANSFER_DST,
-                MemoryUsageBit.DEVICE,
-                65535 * stride,
-                stride,
-            ));
-            const indexBuffer = gfxDevice.createBuffer(new BufferInfo(
-                BufferUsageBit.INDEX | BufferUsageBit.TRANSFER_DST,
-                MemoryUsageBit.DEVICE,
-                65535 * Uint16Array.BYTES_PER_ELEMENT * 2,
-                Uint16Array.BYTES_PER_ELEMENT,
-            ));
+            const vertexBuffer = gfxDevice.createBuffer(new BufferInfo(BufferUsageBit.VERTEX | BufferUsageBit.TRANSFER_DST, MemoryUsageBit.DEVICE, 65535 * stride, stride));
+            const indexBuffer = gfxDevice.createBuffer(
+                new BufferInfo(BufferUsageBit.INDEX | BufferUsageBit.TRANSFER_DST, MemoryUsageBit.DEVICE, 65535 * Uint16Array.BYTES_PER_ELEMENT * 2, Uint16Array.BYTES_PER_ELEMENT)
+            );
 
             const renderMesh = new RenderingSubMesh([vertexBuffer], attributes, PrimitiveMode.TRIANGLE_LIST, indexBuffer);
             renderMesh.subMeshIdx = 0;
@@ -653,7 +643,7 @@ export class Graphics extends UIRenderer {
         }
     }
 
-    protected _uploadData (): void {
+    protected _uploadData(): void {
         const impl = this.impl;
         if (!impl) {
             return;
@@ -685,7 +675,13 @@ export class Graphics extends UIRenderer {
         this._isNeedUploadData = false;
     }
 
-    protected _render (render: IBatcher): void {
+    protected _render(render: IBatcher): void {
+        //#region [自定义]，保护渲染报错
+        if (!this.getMaterialInstance(0)) {
+            return;
+        }
+        //endregion
+
         if (this._isNeedUploadData) {
             if (this.impl) {
                 const renderDataList = this.impl.getRenderDataList();
@@ -702,7 +698,7 @@ export class Graphics extends UIRenderer {
         render.commitModel(this, this.model, this.getMaterialInstance(0));
     }
 
-    protected _flushAssembler (): void {
+    protected _flushAssembler(): void {
         const assembler = Graphics.Assembler.getAssembler(this);
 
         if (this._assembler !== assembler) {
@@ -710,7 +706,7 @@ export class Graphics extends UIRenderer {
         }
     }
 
-    protected _canRender (): boolean {
+    protected _canRender(): boolean {
         if (!super._canRender()) {
             return false;
         }
@@ -725,7 +721,7 @@ export class Graphics extends UIRenderer {
     /**
      * @deprecated since v3.7.0, this is an engine private interface that will be removed in the future.
      */
-    public updateRenderer (): void {
+    public updateRenderer(): void {
         super.updateRenderer();
         if (JSB) {
             if (this._isNeedUploadData) {
@@ -742,7 +738,7 @@ export class Graphics extends UIRenderer {
         }
     }
 
-    protected createRenderEntity (): RenderEntity {
+    protected createRenderEntity(): RenderEntity {
         return new RenderEntity(RenderEntityType.DYNAMIC);
     }
 }
